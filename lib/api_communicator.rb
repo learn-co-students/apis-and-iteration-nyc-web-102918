@@ -69,3 +69,42 @@ end
 
 # that `get_character_movies_from_api` method is probably pretty long. Does it do more than one job?
 # can you split it up into helper methods?
+
+
+
+
+
+def get_planet(planet)
+  response_string = RestClient.get("http://swapi.co/api/planets/")
+  response_hash = JSON.parse(response_string)
+  planet_data = response_hash["results"]
+  # character_name = character_data["name"]
+  planet_data.find do |planet_hash|
+    planet_hash["name"].downcase == planet
+  end
+end
+
+def get_planet_residents_from_api(planet)
+  #make the web request
+  planet_data = get_planet(planet)
+
+  residents = []
+  planet_data["residents"].each do |resident|
+    response_string = RestClient.get(resident)
+    response_hash = JSON.parse(response_string)
+    residents << response_hash
+  end
+
+  residents
+end
+
+def print_residents(residents_hash)
+  residents_hash.each do |resident|
+    puts resident["name"]
+  end
+end
+
+def show_planet_residents(planet)
+  residents_array = get_planet_residents_from_api(planet)
+  print_residents(residents_array)
+end
