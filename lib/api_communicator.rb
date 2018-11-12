@@ -9,7 +9,15 @@ def get_character_movies_from_api(character)
   
   # NOTE: in this demonstration we name many of the variables _hash or _array. 
   # This is done for educational purposes. This is not typically done in code.
+  char_data = response_hash["results"].find{|hash| hash["name"].downcase == character }
 
+  return "Invalid character" if char_data.nil?
+
+  char_data["films"].map do |film|
+    res = RestClient.get(film)
+
+    JSON.parse(res.body)
+  end
 
   # iterate over the response hash to find the collection of `films` for the given
   #   `character`
@@ -32,6 +40,6 @@ def show_character_movies(character)
 end
 
 ## BONUS
-
+binding.pry
 # that `get_character_movies_from_api` method is probably pretty long. Does it do more than one job?
 # can you split it up into helper methods?
