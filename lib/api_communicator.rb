@@ -11,14 +11,7 @@ def get_character_movies_from_api(character)
   # This is done for educational purposes. This is not typically done in code.
   char_data = response_hash["results"].find{|hash| hash["name"].downcase == character }
 
-  return "Invalid character" if char_data.nil?
-
-  char_data["films"].map do |film|
-    res = RestClient.get(film)
-
-    JSON.parse(res.body)
-  end
-
+  get_movies(char_data)
   # iterate over the response hash to find the collection of `films` for the given
   #   `character`
   # collect those film API urls, make a web request to each URL to get the info
@@ -31,7 +24,18 @@ def get_character_movies_from_api(character)
 end
 
 def print_movies(films_hash)
-  # some iteration magic and puts out the movies in a nice list
+  if films_hash.class == String
+    puts films_hash 
+    return
+  end
+
+  films_hash.sort_by{|data| data["release_date"] }.each_with_index do |film, i|
+    puts "#{i + 1}. #{film["title"]}"
+    puts "  Directed by #{film["director"]}"
+    puts "  Produced by #{film["producer"]}"
+    puts "  Released #{film["release_date"]}"
+    puts film["opening_crawl"][0..150] + "...\n"
+  end
 end
 
 def show_character_movies(character)
@@ -40,6 +44,14 @@ def show_character_movies(character)
 end
 
 ## BONUS
-binding.pry
+def get_movies(char_data)
+  return "Invalid character" if char_data.nil?
+
+  char_data["films"].map do |film|
+    res = RestClient.get(film)
+
+    JSON.parse(res.body)
+  end
+end
 # that `get_character_movies_from_api` method is probably pretty long. Does it do more than one job?
 # can you split it up into helper methods?
