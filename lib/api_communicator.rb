@@ -5,8 +5,25 @@ require 'pry'
 def get_character(character)
   response_string = RestClient.get('http://www.swapi.co/api/people/')
   response_hash = JSON.parse(response_string)
-  character_data = response_hash["results"]
+  # character_data = response_hash["results"]
   # character_name = character_data["name"]
+
+
+  character_data = []
+
+
+  i = 1
+  new_response_string = RestClient.get("https://swapi.co/api/people/?page=#{i}")
+  new_response_hash = JSON.parse(new_response_string)
+
+  while !(new_response_hash["next"].nil?)
+    new_response_string = RestClient.get("https://swapi.co/api/people/?page=#{i}")
+    new_response_hash = JSON.parse(new_response_string)
+    character_data.concat(new_response_hash["results"])
+    i += 1
+  end
+
+
   character_data.find do |character_hash|
     character_hash["name"].downcase == character
   end
@@ -77,8 +94,33 @@ end
 def get_planet(planet)
   response_string = RestClient.get("http://swapi.co/api/planets/")
   response_hash = JSON.parse(response_string)
-  planet_data = response_hash["results"]
-  # character_name = character_data["name"]
+  # planet_data = response_hash["results"]
+  planet_data = []
+
+
+  i = 1
+  new_response_string = RestClient.get("https://swapi.co/api/planets/?page=#{i}")
+  new_response_hash = JSON.parse(new_response_string)
+
+  while !(new_response_hash["next"].nil?)
+    new_response_string = RestClient.get("https://swapi.co/api/planets/?page=#{i}")
+    new_response_hash = JSON.parse(new_response_string)
+    planet_data.concat(new_response_hash["results"])
+    i += 1
+  end
+
+
+  # while !(response_hash["next"].nil?)
+  #    new_response_string = RestClient.get(response_hash["next"])
+  #    new_response_hash = JSON.parse(new_response_string)
+  #    planet_data.concat(new_response_hash["results"])
+  #    break if new_response_hash["next"].nil?
+  # end
+
+
+
+
+
   planet_data.find do |planet_hash|
     planet_hash["name"].downcase == planet
   end
